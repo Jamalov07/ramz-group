@@ -35,9 +35,6 @@ services:
       BOT_TOKEN: ${BOT_TOKEN}
       SELLING_CHANNEL_ID: ${SELLING_CHANNEL_ID}
       PAYMENT_CHANNEL_ID: ${PAYMENT_CHANNEL_ID}
-      OLD_SERVICE_BASE_URL: ${OLD_SERVICE_BASE_URL}
-      OLD_SERVICE_USER: ${OLD_SERVICE_USER}
-      OLD_SERVICE_PASS: ${OLD_SERVICE_PASS}
     volumes:
       - uploads_data:/app/uploads
     depends_on:
