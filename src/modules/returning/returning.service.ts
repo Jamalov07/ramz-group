@@ -33,12 +33,14 @@ export class ReturningService {
 		const returningsCount = await this.returningRepository.countFindMany(query)
 
 		const mappedReturnings = returnings.map((returning) => {
+			const discountPrice = returning.totalDiscountPrice ?? returning.totalPrice
 			return {
 				...returning,
 				payment: returning.payment.total.toNumber() ? returning.payment : null,
-				debt: returning.totalPrice.minus(returning.payment.total),
+				debt: discountPrice.minus(returning.payment.total),
 				totalPayment: returning.payment.total,
 				totalPrice: returning.totalPrice,
+				totalDiscountPrice: discountPrice,
 			}
 		})
 
@@ -149,7 +151,7 @@ export class ReturningService {
 			}),
 		}
 
-		const returning = await this.returningRepository.createOne({ ...body, totalPrice: totalPrice })
+		const returning = await this.returningRepository.createOne({ ...body, totalPrice: totalPrice, totalDiscountPrice: totalPrice, discount: new Decimal(0) })
 
 		return createResponse({ data: returning, success: { messages: ['create one success'] } })
 	}
@@ -177,9 +179,18 @@ export class ReturningService {
 			body.date = new Date()
 		}
 
+		// Discount va totalDiscountPrice hisoblash
+		const existingDiscount = new Decimal(returning.data.discount ?? 0)
+		const discount = body.discount !== undefined ? new Decimal(body.discount) : existingDiscount
+		const totalPrice = body.totalPrice !== undefined ? new Decimal(body.totalPrice) : new Decimal(returning.data.totalPrice ?? 0)
+		const totalDiscountPrice = totalPrice.mul(new Decimal(100).minus(discount)).div(100)
+
 		body = {
 			...body,
 			staffId: returning.data.staffId,
+			totalPrice: totalPrice,
+			discount: discount,
+			totalDiscountPrice: totalDiscountPrice,
 			payment: hasValidPayment ? body.payment : returning.data.payment,
 		}
 		await this.returningRepository.updateOne(query, body)

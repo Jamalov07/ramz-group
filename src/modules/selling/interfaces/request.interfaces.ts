@@ -19,13 +19,13 @@ export declare interface SellingPayment extends Pick<ClientPaymentRequired, 'car
 
 export declare interface SellingProduct extends Pick<ProductMVRequired, 'price' | 'count' | 'productId'>, Pick<ProductMVOptional, 'totalPrice'> {}
 
-export declare interface SellingCreateOneRequest extends Pick<SellingRequired, 'clientId' | 'date'>, Pick<SellingOptional, 'staffId' | 'status' | 'totalPrice'> {
+export declare interface SellingCreateOneRequest extends Pick<SellingRequired, 'clientId' | 'date'>, Pick<SellingOptional, 'staffId' | 'status' | 'totalPrice' | 'totalDiscountPrice'> {
 	payment?: SellingPayment
 	products?: SellingProduct[]
 	send?: boolean
 }
 
-export declare interface SellingUpdateOneRequest extends Pick<SellingOptional, 'deletedAt' | 'clientId' | 'date' | 'status' | 'staffId' | 'totalPrice'> {
+export declare interface SellingUpdateOneRequest extends Pick<SellingOptional, 'deletedAt' | 'clientId' | 'date' | 'status' | 'staffId' | 'totalPrice' | 'discount' | 'totalDiscountPrice'> {
 	payment?: SellingPayment
 	send?: boolean
 }

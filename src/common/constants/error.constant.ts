@@ -6,6 +6,23 @@ export const ERROR_MSG = {
 			UZ: 'harakat topilmadi',
 		},
 	},
+	CURRENCY: {
+		NOT_FOUND: {
+			EN: 'currency not found',
+			RU: 'currency not found',
+			UZ: 'pul birligi topilmadi',
+		},
+		NAME_EXISTS: {
+			EN: 'name already exists',
+			RU: 'name already exists',
+			UZ: 'nom allaqachon mavjud',
+		},
+		SYMBOL_EXISTS: {
+			EN: 'symbol already exists',
+			RU: 'symbol already exists',
+			UZ: 'belgi allaqachon mavjud',
+		},
+	},
 	ARRIVAL: {
 		NOT_FOUND: {
 			EN: 'arrival not found',

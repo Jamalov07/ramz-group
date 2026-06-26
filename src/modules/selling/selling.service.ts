@@ -42,6 +42,7 @@ export class SellingService {
 
 		const calc = {
 			totalPrice: new Decimal(0),
+			totalDiscountPrice: new Decimal(0),
 			totalPayment: new Decimal(0),
 			totalCardPayment: new Decimal(0),
 			totalCashPayment: new Decimal(0),
@@ -51,9 +52,11 @@ export class SellingService {
 		}
 
 		const mappedSellings = sellings.map((selling) => {
+			const discountPrice = selling.totalDiscountPrice ?? selling.totalPrice
 			calc.totalPrice = calc.totalPrice.plus(selling.totalPrice)
+			calc.totalDiscountPrice = calc.totalDiscountPrice.plus(discountPrice)
 			calc.totalPayment = calc.totalPayment.plus(selling.payment.total)
-			calc.totalDebt = calc.totalDebt.plus(selling.totalPrice.minus(selling.payment.total))
+			calc.totalDebt = calc.totalDebt.plus(discountPrice.minus(selling.payment.total))
 			calc.totalCardPayment = calc.totalCardPayment.plus(selling.payment.card)
 			calc.totalCashPayment = calc.totalCashPayment.plus(selling.payment.cash)
 			calc.totalOtherPayment = calc.totalOtherPayment.plus(selling.payment.other)
@@ -62,9 +65,10 @@ export class SellingService {
 			return {
 				...selling,
 				payment: selling.payment.total.toNumber() ? selling.payment : null,
-				debt: selling.totalPrice.minus(selling.payment.total),
+				debt: discountPrice.minus(selling.payment.total),
 				totalPayment: selling.payment.total,
 				totalPrice: selling.totalPrice,
+				totalDiscountPrice: discountPrice,
 			}
 		})
 
@@ -190,7 +194,7 @@ export class SellingService {
 			}),
 		}
 
-		const selling = await this.sellingRepository.createOne({ ...body, totalPrice: totalPrice })
+		const selling = await this.sellingRepository.createOne({ ...body, totalPrice: totalPrice, totalDiscountPrice: totalPrice })
 
 		if (body.send) {
 			if (selling.status === SellingStatusEnum.accepted) {
@@ -276,18 +280,29 @@ export class SellingService {
 				: selling.data.payment, // agar payment yo‘q bo‘lsa, eskisini saqlaymiz
 		}
 
+		// Discount va totalDiscountPrice hisoblash
+		const existingDiscount = new Decimal(selling.data.discount ?? 0)
+		const discount = body.discount !== undefined ? new Decimal(body.discount) : existingDiscount
+		const totalPrice = body.totalPrice !== undefined ? new Decimal(body.totalPrice) : new Decimal(selling.data.totalPrice ?? 0)
+		const totalDiscountPrice = totalPrice.mul(new Decimal(100).minus(discount)).div(100)
+		body.totalPrice = totalPrice
+		body.discount = discount
+		body.totalDiscountPrice = totalDiscountPrice
+
 		const updatedSelling = await this.sellingRepository.updateOne(query, body)
 
 		// Clientni yangilaymiz
 		const client = await this.clientService.findOne({ id: selling.data.client.id })
 
+		const updatedDiscountPrice = updatedSelling.totalDiscountPrice ?? updatedSelling.totalPrice
 		const sellingInfo = {
 			...updatedSelling,
 			client: client.data,
 			title: isFirstSend ? BotSellingTitleEnum.new : undefined,
 			totalPayment: total,
 			totalPrice: updatedSelling.totalPrice,
-			debt: updatedSelling.totalPrice.minus(total),
+			totalDiscountPrice: updatedDiscountPrice,
+			debt: updatedDiscountPrice.minus(total),
 			products: updatedSelling.products.map((p) => ({
 				...p,
 				status: BotSellingProductTitleEnum.new,
@@ -390,10 +405,10 @@ export class SellingService {
 						client: { deletedAt: null },
 						status: SellingStatusEnum.accepted,
 					},
-					_sum: { totalPrice: true },
+					_sum: { totalDiscountPrice: true },
 				})
 
-				return new Decimal(result._sum.totalPrice || 0)
+				return new Decimal(result._sum.totalDiscountPrice || 0)
 			}),
 		)
 
@@ -423,7 +438,7 @@ export class SellingService {
 				balance: true,
 				sellings: {
 					where: { status: SellingStatusEnum.accepted },
-					select: { totalPrice: true, payment: { select: { total: true } } },
+					select: { totalPrice: true, totalDiscountPrice: true, payment: { select: { total: true } } },
 				},
 				returnings: {
 					where: { status: SellingStatusEnum.accepted },
@@ -436,7 +451,7 @@ export class SellingService {
 		let ourDebt = new Decimal(0)
 
 		for (const c of clients) {
-			const sellingDebt = c.sellings.reduce((acc, s) => acc.plus(s.totalPrice).minus(s.payment.total), new Decimal(0))
+			const sellingDebt = c.sellings.reduce((acc, s) => acc.plus(s.totalDiscountPrice ?? s.totalPrice).minus(s.payment.total), new Decimal(0))
 			c.returnings.map((returning) => {
 				c.balance = c.balance.minus(returning.payment.fromBalance)
 			})

@@ -42,6 +42,8 @@ export class SellingRepository implements OnModuleInit {
 				id: true,
 				status: true,
 				totalPrice: true,
+				totalDiscountPrice: true,
+				discount: true,
 				updatedAt: true,
 				createdAt: true,
 				deletedAt: true,
@@ -158,6 +160,9 @@ export class SellingRepository implements OnModuleInit {
 			select: {
 				id: true,
 				status: true,
+				totalPrice: true,
+				totalDiscountPrice: true,
+				discount: true,
 				updatedAt: true,
 				createdAt: true,
 				deletedAt: true,
@@ -205,6 +210,8 @@ export class SellingRepository implements OnModuleInit {
 				date: dayClose ? body.date : undefined,
 				staffId: body.staffId,
 				totalPrice: body.totalPrice,
+				totalDiscountPrice: body.totalDiscountPrice ?? body.totalPrice,
+				discount: 0,
 				createdAt: dayClose ? body.date : undefined,
 				payment: {
 					create: {
@@ -273,6 +280,8 @@ export class SellingRepository implements OnModuleInit {
 				clientId: body.clientId,
 				deletedAt: body.deletedAt,
 				totalPrice: body.totalPrice,
+				totalDiscountPrice: body.totalDiscountPrice,
+				discount: body.discount !== undefined ? body.discount : undefined,
 				payment: {
 					update: {
 						total: body.payment.total,
@@ -295,6 +304,8 @@ export class SellingRepository implements OnModuleInit {
 				deletedAt: true,
 				date: true,
 				totalPrice: true,
+				totalDiscountPrice: true,
+				discount: true,
 				client: { select: { fullname: true, phone: true, id: true, createdAt: true, telegram: true } },
 				staff: { select: { fullname: true, phone: true, id: true, createdAt: true } },
 				payment: { select: { total: true, id: true, card: true, cash: true, other: true, type: true, transfer: true, description: true, createdAt: true } },
@@ -381,11 +392,11 @@ export class SellingRepository implements OnModuleInit {
 			const hourEnd = convertUTCtoLocal(new Date(extractedNow.year, extractedNow.month, extractedNow.day, hour, 59, 59, 999))
 			const sales = await this.prisma.sellingModel.findMany({
 				where: { createdAt: { gte: hourStart, lte: hourEnd } },
-				select: { totalPrice: true },
+				select: { totalDiscountPrice: true },
 			})
 
 			const totalSum = sales.reduce((sum, selling) => {
-				return sum.plus(selling.totalPrice)
+				return sum.plus(selling.totalDiscountPrice)
 			}, new Decimal(0))
 
 			const start = extractDateParts(hourStart)
@@ -413,10 +424,10 @@ export class SellingRepository implements OnModuleInit {
 
 			const sales = await this.prisma.sellingModel.findMany({
 				where: { createdAt: { gte: dayStart, lte: dayEnd } },
-				select: { totalPrice: true },
+				select: { totalDiscountPrice: true },
 			})
 
-			const totalSum = sales.reduce((sum, selling) => sum.plus(selling.totalPrice), new Decimal(0))
+			const totalSum = sales.reduce((sum, selling) => sum.plus(selling.totalDiscountPrice), new Decimal(0))
 
 			salesByDay.push({
 				date: `${dayStart.getFullYear()}-${String(dayStart.getMonth() + 1).padStart(2, '0')}-${String(dayStart.getDate()).padStart(2, '0')}`,
@@ -441,11 +452,11 @@ export class SellingRepository implements OnModuleInit {
 
 			const sales = await this.prisma.sellingModel.findMany({
 				where: { createdAt: { gte: dayStart, lte: dayEnd } },
-				select: { totalPrice: true },
+				select: { totalDiscountPrice: true },
 			})
 
 			const totalSum = sales.reduce((sum, selling) => {
-				return sum.plus(selling.totalPrice)
+				return sum.plus(selling.totalDiscountPrice)
 			}, new Decimal(0))
 
 			salesByDay.push({
@@ -469,11 +480,11 @@ export class SellingRepository implements OnModuleInit {
 
 			const sales = await this.prisma.sellingModel.findMany({
 				where: { createdAt: { gte: monthStart, lte: monthEnd } },
-				select: { totalPrice: true },
+				select: { totalDiscountPrice: true },
 			})
 
 			const totalSum = sales.reduce((sum, selling) => {
-				return sum.plus(selling.totalPrice)
+				return sum.plus(selling.totalDiscountPrice)
 			}, new Decimal(0))
 			salesByMonth.push({
 				date: dateFormat(monthStart),

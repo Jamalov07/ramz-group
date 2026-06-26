@@ -54,7 +54,7 @@ export class SellingCreateOneRequestDto
 }
 
 export class SellingUpdateOneRequestDto
-	extends IntersectionType(PickType(SellingOptionalDto, ['deletedAt', 'clientId', 'date', 'status', 'send']))
+	extends IntersectionType(PickType(SellingOptionalDto, ['deletedAt', 'clientId', 'date', 'status', 'send', 'discount']))
 	implements SellingUpdateOneRequest
 {
 	@ApiPropertyOptional({ type: SellingPaymentDto })

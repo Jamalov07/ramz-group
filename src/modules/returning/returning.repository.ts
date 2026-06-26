@@ -37,6 +37,8 @@ export class ReturningRepository implements OnModuleInit {
 				id: true,
 				status: true,
 				totalPrice: true,
+				totalDiscountPrice: true,
+				discount: true,
 				updatedAt: true,
 				createdAt: true,
 				deletedAt: true,
@@ -106,7 +108,7 @@ export class ReturningRepository implements OnModuleInit {
 	async getOne(query: ReturningGetOneRequest) {
 		const returning = await this.prisma.returningModel.findFirst({
 			where: { id: query.id, clientId: query.clientId, staffId: query.staffId, status: query.status },
-			select: { id: true, payment: true, staffId: true, status: true },
+			select: { id: true, payment: true, staffId: true, status: true, discount: true, totalPrice: true, totalDiscountPrice: true },
 		})
 
 		return returning
@@ -143,6 +145,8 @@ export class ReturningRepository implements OnModuleInit {
 				createdAt: dayClose ? body.date : undefined,
 				staffId: body.staffId,
 				totalPrice: body.totalPrice,
+				totalDiscountPrice: body.totalDiscountPrice,
+				discount: body.discount,
 				payment: {
 					create: {
 						total: body.payment.total,
@@ -219,6 +223,8 @@ export class ReturningRepository implements OnModuleInit {
 				status: body.status,
 				clientId: body.clientId,
 				totalPrice: body.totalPrice,
+				totalDiscountPrice: body.totalDiscountPrice,
+				discount: body.discount,
 				deletedAt: body.deletedAt,
 				payment: {
 					update: {

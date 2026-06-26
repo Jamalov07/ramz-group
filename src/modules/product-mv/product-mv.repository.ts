@@ -373,7 +373,10 @@ export class ProductMVRepository {
 	}
 
 	async updateSellingTotalPrice(id: string, totalPrice: Decimal) {
-		await this.prisma.sellingModel.update({ where: { id: id }, data: { totalPrice: totalPrice } })
+		const selling = await this.prisma.sellingModel.findFirst({ where: { id }, select: { discount: true } })
+		const discount = selling?.discount ?? new Decimal(0)
+		const totalDiscountPrice = totalPrice.mul(new Decimal(100).minus(discount)).div(100)
+		await this.prisma.sellingModel.update({ where: { id: id }, data: { totalPrice: totalPrice, totalDiscountPrice: totalDiscountPrice } })
 	}
 
 	async updateOneArrival(query: ProductMVGetOneRequest, body: ArrivalProductMVUpdateOneRequest) {
@@ -436,12 +439,13 @@ export class ProductMVRepository {
 			select: {
 				id: true,
 				type: true,
-				returning: true,
+				returning: { select: { id: true, totalPrice: true, discount: true, status: true } },
 				arrival: true,
 				selling: {
 					select: {
 						id: true,
 						totalPrice: true,
+						discount: true,
 						status: true,
 						publicId: true,
 						updatedAt: true,
@@ -463,7 +467,9 @@ export class ProductMVRepository {
 
 		if (product.type === ServiceTypeEnum.selling) {
 			const totalPrice = product.selling.totalPrice.minus(product.price.mul(product.count))
-			await this.prisma.sellingModel.update({ where: { id: product.selling.id }, data: { totalPrice: totalPrice } })
+			const sellingDiscount = product.selling.discount ?? new Decimal(0)
+			const totalDiscountPrice = totalPrice.mul(new Decimal(100).minus(sellingDiscount)).div(100)
+			await this.prisma.sellingModel.update({ where: { id: product.selling.id }, data: { totalPrice: totalPrice, totalDiscountPrice: totalDiscountPrice } })
 			if (product.selling && product.selling.status === SellingStatusEnum.accepted) {
 				await this.prisma.productModel.update({ where: { id: product.product.id }, data: { count: { increment: product.count } } })
 			}
@@ -474,7 +480,9 @@ export class ProductMVRepository {
 			await this.prisma.productModel.update({ where: { id: product.product.id }, data: { count: { decrement: product.count } } })
 		} else if (product.type === ServiceTypeEnum.returning) {
 			const totalPrice = product.returning.totalPrice.minus(product.price.mul(product.count))
-			await this.prisma.returningModel.update({ where: { id: product.returning.id }, data: { totalPrice: totalPrice } })
+			const returningDiscount = product.returning.discount ?? new Decimal(0)
+			const totalDiscountPrice = totalPrice.mul(new Decimal(100).minus(returningDiscount)).div(100)
+			await this.prisma.returningModel.update({ where: { id: product.returning.id }, data: { totalPrice: totalPrice, totalDiscountPrice: totalDiscountPrice } })
 			if (product.returning && product.returning.status === SellingStatusEnum.accepted) {
 				await this.prisma.productModel.update({ where: { id: product.product.id }, data: { count: { increment: product.count } } })
 			}

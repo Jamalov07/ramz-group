@@ -32,7 +32,7 @@ export class ClientService {
 
 		const mappedClients = clients.map((c) => {
 			const sellingDebt = c.sellings.reduce((acc, sel) => {
-				return acc.plus(sel.totalPrice).minus(sel.payment.total)
+				return acc.plus(sel.totalDiscountPrice ?? sel.totalPrice).minus(sel.payment.total)
 			}, new Decimal(0))
 
 			c.returnings.map((returning) => {
@@ -105,7 +105,7 @@ export class ClientService {
 		}> = []
 
 		for (const c of clients) {
-			const sellingDebt = c.sellings.reduce((acc, sel) => acc.plus(sel.totalPrice).minus(sel.payment.total), new Decimal(0))
+			const sellingDebt = c.sellings.reduce((acc, sel) => acc.plus(sel.totalDiscountPrice ?? sel.totalPrice).minus(sel.payment.total), new Decimal(0))
 
 			const returningDeduction = c.returnings.reduce((acc, r) => acc.plus(r.payment.fromBalance), new Decimal(0))
 
@@ -224,9 +224,11 @@ export class ClientService {
 		}, new Decimal(0))
 
 		const sellingDebt = client.sellings.reduce((acc, sel) => {
+			const sellingTotal = sel.totalDiscountPrice ?? sel.totalPrice
+
 			if ((!deedStartDate || sel.date >= deedStartDate) && (!deedEndDate || sel.date <= deedEndDate)) {
-				deeds.push({ type: 'debit', action: 'selling', value: sel.totalPrice, date: sel.date, description: '' })
-				totalDebit = totalDebit.plus(sel.totalPrice)
+				deeds.push({ type: 'debit', action: 'selling', value: sellingTotal, date: sel.date, description: '' })
+				totalDebit = totalDebit.plus(sellingTotal)
 			}
 
 			if ((!deedStartDate || sel.payment.createdAt >= deedStartDate) && (!deedEndDate || sel.payment.createdAt <= deedEndDate)) {
@@ -234,7 +236,7 @@ export class ClientService {
 				totalCredit = totalCredit.plus(sel.payment.total)
 			}
 
-			return acc.plus(sel.totalPrice).minus(sel.payment.total)
+			return acc.plus(sellingTotal).minus(sel.payment.total)
 		}, new Decimal(0))
 
 		let returningTotalSum = new Decimal(0)
@@ -250,7 +252,7 @@ export class ClientService {
 		const filteredDeeds = deeds.filter((d) => !d.value.equals(0)).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
 		const sellingDebt2 = client.sellings.reduce((acc, sel) => {
-			return acc.plus(sel.totalPrice).minus(sel.payment.total)
+			return acc.plus(sel.totalDiscountPrice ?? sel.totalPrice).minus(sel.payment.total)
 		}, new Decimal(0))
 
 		client.returnings.map((returning) => {

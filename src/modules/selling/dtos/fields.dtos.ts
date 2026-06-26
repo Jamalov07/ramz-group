@@ -1,8 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { DefaultOptionalFieldsDto, DefaultRequiredFieldsDto } from '../../../common'
+import { DefaultOptionalFieldsDto, DefaultRequiredFieldsDto, IsDecimalIntOrBigInt } from '../../../common'
 import { SellingOptional, SellingRequired } from '../interfaces'
-import { IsBoolean, IsDateString, IsEnum, IsJWT, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, IsUUID } from 'class-validator'
+import { IsBoolean, IsDateString, IsEnum, IsJWT, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, IsUUID, Max, Min } from 'class-validator'
 import { $Enums, SellingStatusEnum, UserTypeEnum } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime/library'
 
 export class SellingRequiredDto extends DefaultRequiredFieldsDto implements SellingRequired {
 	@ApiProperty({ type: String })
@@ -66,4 +67,11 @@ export class SellingOptionalDto extends DefaultOptionalFieldsDto implements Sell
 	@IsOptional()
 	@IsEnum(SellingStatusEnum)
 	status?: $Enums.SellingStatusEnum
+
+	@ApiPropertyOptional({ type: Number, minimum: 0, maximum: 100 })
+	@IsOptional()
+	@IsDecimalIntOrBigInt()
+	@Min(0)
+	@Max(100)
+	discount?: Decimal
 }

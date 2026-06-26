@@ -21,6 +21,7 @@ import {
 	BotModule,
 	PdfModule,
 	CommonModule,
+	CurrencyModule,
 	UploadModule,
 } from '@module'
 import { appConfig, botConfig, databaseConfig, jwtConfig } from '@config'
@@ -52,6 +53,7 @@ import { AuthGuard, CheckPermissionGuard } from '@common'
 		PdfModule,
 		BotModule,
 		CommonModule,
+		CurrencyModule,
 		UploadModule,
 	],
 	controllers: [],

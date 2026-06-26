@@ -18,12 +18,15 @@ export declare interface ReturningPayment extends Pick<PaymentModel, 'fromBalanc
 
 export declare interface ReturningProduct extends Pick<ProductMVRequired, 'price' | 'count' | 'totalPrice' | 'productId'> {}
 
-export declare interface ReturningCreateOneRequest extends Pick<ReturningRequired, 'clientId' | 'date'>, Pick<ReturningOptional, 'staffId' | 'status' | 'totalPrice'> {
+export declare interface ReturningCreateOneRequest
+	extends Pick<ReturningRequired, 'clientId' | 'date'>,
+		Pick<ReturningOptional, 'staffId' | 'status' | 'totalPrice' | 'totalDiscountPrice' | 'discount'> {
 	payment?: ReturningPayment
 	products?: ReturningProduct[]
 }
 
-export declare interface ReturningUpdateOneRequest extends Pick<ReturningOptional, 'deletedAt' | 'clientId' | 'date' | 'staffId' | 'status' | 'totalPrice'> {
+export declare interface ReturningUpdateOneRequest
+	extends Pick<ReturningOptional, 'deletedAt' | 'clientId' | 'date' | 'staffId' | 'status' | 'totalPrice' | 'totalDiscountPrice' | 'discount'> {
 	payment?: ReturningPayment
 	products?: ReturningProduct[]
 	productIdsToRemove?: string[]

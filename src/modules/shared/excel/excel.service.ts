@@ -1804,6 +1804,7 @@ export class ExcelService {
 					select: {
 						date: true,
 						totalPrice: true,
+						totalDiscountPrice: true,
 						payment: { select: { total: true } },
 					},
 					orderBy: { date: 'desc' },
@@ -1814,7 +1815,7 @@ export class ExcelService {
 		const mappedClients = clients.map((c) => {
 			// Sotuvlardan qarz
 			const sellingDebt = c.sellings.reduce((acc, sel) => {
-				return acc.plus(sel.totalPrice).minus(sel.payment.total)
+				return acc.plus(sel.totalDiscountPrice ?? sel.totalPrice).minus(sel.payment.total)
 			}, new Decimal(0))
 
 			// Qaytarishlardan balance kamayishi

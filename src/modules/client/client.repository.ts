@@ -50,6 +50,7 @@ export class ClientRepository implements OnModuleInit {
 					select: {
 						date: true,
 						totalPrice: true,
+						totalDiscountPrice: true,
 						payment: { select: { card: true, cash: true, other: true, transfer: true, total: true } },
 						products: { select: { count: true, price: true } },
 					},
@@ -92,6 +93,7 @@ export class ClientRepository implements OnModuleInit {
 					select: {
 						date: true,
 						totalPrice: true,
+						totalDiscountPrice: true,
 						payment: { select: { total: true } },
 					},
 					orderBy: { date: 'desc' as const },
@@ -177,13 +179,13 @@ export class ClientRepository implements OnModuleInit {
 				...(query.endDate && { date: { lte: query.endDate } }),
 			},
 			_count: { clientId: true },
-			_sum: { totalPrice: true },
+			_sum: { totalPrice: true, totalDiscountPrice: true },
 		})
 
 		for (const s of sellingStats) {
 			const c = getClient(s.clientId)
 			c.selling.count = Number(s._count.clientId)
-			c.selling.totalPrice = Number(s._sum.totalPrice ?? 0)
+			c.selling.totalPrice = Number(s._sum.totalDiscountPrice ?? s._sum.totalPrice ?? 0)
 		}
 
 		// --- PAYMENT STATS ---
@@ -223,7 +225,7 @@ export class ClientRepository implements OnModuleInit {
 		for (const r of returningStats) {
 			const c = getClient(r.clientId)
 			c.returning.count += 1
-			c.returning.totalPrice += Number(r.totalPrice ?? 0)
+			c.returning.totalPrice += Number(r.totalDiscountPrice ?? r.totalPrice ?? 0)
 			c.returning.payment.totalFromBalance += Number(r.payment?.fromBalance ?? 0)
 			c.returning.payment.totalCash += Number(r.payment?.cash ?? 0)
 		}
@@ -252,6 +254,7 @@ export class ClientRepository implements OnModuleInit {
 					select: {
 						date: true,
 						totalPrice: true,
+						totalDiscountPrice: true,
 						products: { select: { cost: true, count: true, price: true } },
 						payment: {
 							select: { total: true, card: true, cash: true, other: true, transfer: true, createdAt: true, description: true },
