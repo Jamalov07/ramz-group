@@ -80,40 +80,54 @@ export class PdfService {
 					},
 					margin: [0, 10, 0, 10],
 				},
-				{
-					text: `Итого: ${selling.totalPrice?.toNumber() || 0}`,
-					fontSize: 13,
-					bold: true,
-					color: 'red',
-					alignment: 'right',
-					margin: [0, 5, 0, 0],
-				},
-				{
-					text: `Остальный долг: ${selling.debt?.toNumber() || 0}`,
-					fontSize: 13,
-					bold: true,
-					color: 'red',
-					alignment: 'right',
-					margin: [0, 5, 0, 0],
-				},
-			],
-			images: {
-				logo: logoBase64,
+			{
+				text: `Итого: ${selling.totalPrice?.toNumber() || 0}`,
+				fontSize: 13,
+				bold: true,
+				alignment: 'right',
+				margin: [0, 5, 0, 0],
 			},
-			defaultStyle: {
-				font: 'Roboto',
+			{
+				text: `Сумма со скидкой: ${(selling.totalDiscountPrice ?? selling.totalPrice)?.toNumber() || 0}`,
+				fontSize: 13,
+				bold: true,
+				alignment: 'right',
+				margin: [0, 5, 0, 0],
 			},
-		}
-
-		return new Promise((resolve, reject) => {
-			const pdfDocGenerator = pdfMake.createPdf(docDefinition)
-			pdfDocGenerator.getBuffer((buffer) => {
-				resolve(Buffer.from(buffer))
-			})
-		})
+			{
+				text: `Оплачено: ${selling.totalPayment?.toNumber() ?? selling.payment?.total?.toNumber() ?? 0}`,
+				fontSize: 13,
+				bold: true,
+				color: 'green',
+				alignment: 'right',
+				margin: [0, 5, 0, 0],
+			},
+			{
+				text: `Остаток долга: ${selling.debt?.toNumber() || 0}`,
+				fontSize: 13,
+				bold: true,
+				color: 'red',
+				alignment: 'right',
+				margin: [0, 5, 0, 0],
+			},
+		],
+		images: {
+			logo: logoBase64,
+		},
+		defaultStyle: {
+			font: 'Roboto',
+		},
 	}
 
-	async generateInvoicePdfBuffer2(selling: SellingFindOneData): Promise<Buffer> {
+	return new Promise((resolve, reject) => {
+		const pdfDocGenerator = pdfMake.createPdf(docDefinition)
+		pdfDocGenerator.getBuffer((buffer) => {
+			resolve(Buffer.from(buffer))
+		})
+	})
+}
+
+async generateInvoicePdfBuffer2(selling: SellingFindOneData): Promise<Buffer> {
 		const docDefinition: TDocumentDefinitions = {
 			content: [
 				{
@@ -187,40 +201,54 @@ export class PdfService {
 					},
 					margin: [0, 10, 0, 10],
 				},
-				{
-					text: `Итого: ${selling.totalPrice?.toNumber() || 0}`,
-					fontSize: 13,
-					bold: true,
-					color: 'red',
-					alignment: 'right',
-					margin: [0, 5, 0, 0],
-				},
-				{
-					text: `Остальный долг: ${selling.debt?.toNumber() || 0}`,
-					fontSize: 13,
-					bold: true,
-					color: 'red',
-					alignment: 'right',
-					margin: [0, 5, 0, 0],
-				},
-			],
-			images: {
-				logo: logoBase64,
+			{
+				text: `Итого: ${selling.totalPrice?.toNumber() || 0}`,
+				fontSize: 13,
+				bold: true,
+				alignment: 'right',
+				margin: [0, 5, 0, 0],
 			},
-			defaultStyle: {
-				font: 'Roboto',
+			{
+				text: `Сумма со скидкой: ${(selling.totalDiscountPrice ?? selling.totalPrice)?.toNumber() || 0}`,
+				fontSize: 13,
+				bold: true,
+				alignment: 'right',
+				margin: [0, 5, 0, 0],
 			},
-		}
-
-		return new Promise((resolve, reject) => {
-			const pdfDocGenerator = pdfMake.createPdf(docDefinition)
-			pdfDocGenerator.getBuffer((buffer) => {
-				resolve(Buffer.from(buffer))
-			})
-		})
+			{
+				text: `Оплачено: ${selling.totalPayment?.toNumber() ?? selling.payment?.total?.toNumber() ?? 0}`,
+				fontSize: 13,
+				bold: true,
+				color: 'green',
+				alignment: 'right',
+				margin: [0, 5, 0, 0],
+			},
+			{
+				text: `Остаток долга: ${selling.debt?.toNumber() || 0}`,
+				fontSize: 13,
+				bold: true,
+				color: 'red',
+				alignment: 'right',
+				margin: [0, 5, 0, 0],
+			},
+		],
+		images: {
+			logo: logoBase64,
+		},
+		defaultStyle: {
+			font: 'Roboto',
+		},
 	}
 
-	private formatDate(date: Date): string {
+	return new Promise((resolve, reject) => {
+		const pdfDocGenerator = pdfMake.createPdf(docDefinition)
+		pdfDocGenerator.getBuffer((buffer) => {
+			resolve(Buffer.from(buffer))
+		})
+	})
+}
+
+private formatDate(date: Date): string {
 		const dd = String(date.getDate()).padStart(2, '0')
 		const mm = String(date.getMonth() + 1).padStart(2, '0') // 0-based
 		const yyyy = date.getFullYear()

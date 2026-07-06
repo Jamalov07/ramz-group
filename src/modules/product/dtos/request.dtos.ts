@@ -10,11 +10,11 @@ export class ProductFindManyRequestDto
 export class ProductFindOneRequestDto extends IntersectionType(PickType(ProductRequiredDto, ['id'])) implements ProductFindOneRequest {}
 
 export class ProductCreateOneRequestDto
-	extends IntersectionType(PickType(ProductRequiredDto, ['name', 'cost', 'count', 'minAmount', 'price']))
+	extends IntersectionType(PickType(ProductRequiredDto, ['name', 'cost', 'count', 'minAmount', 'price', 'wholesalePrice']))
 	implements ProductCreateOneRequest {}
 
 export class ProductUpdateOneRequestDto
-	extends IntersectionType(PickType(ProductOptionalDto, ['name', 'deletedAt', 'cost', 'count', 'minAmount', 'price']))
+	extends IntersectionType(PickType(ProductOptionalDto, ['name', 'deletedAt', 'cost', 'count', 'minAmount', 'price', 'wholesalePrice']))
 	implements ProductUpdateOneRequest {}
 
 export class ProductDeleteOneRequestDto

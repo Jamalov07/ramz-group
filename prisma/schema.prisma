@@ -319,6 +319,7 @@ model ProductModel {
   name       String    @map("name")        @db.VarChar()
   cost       Decimal   @map("cost")        @db.Decimal(10, 3)  @default(0)
   price      Decimal   @map("price")       @db.Decimal(10, 3)  @default(0)
+  wholesalePrice Decimal   @map("wholesale_price") @db.Decimal(10, 3)  @default(0)
   minAmount  Int       @map("min_amount")  @db.Integer         @default(1)
   count      Int       @map("count")       @db.Integer         @default(1)
   totalPrice Decimal   @map("total_price") @db.Decimal(10, 3)  @default(0)

@@ -73,6 +73,7 @@ export class ProductManyNewRepository {
 				id: true,
 				cost: true,
 				price: true,
+				wholesalePrice: true,
 				count: true,
 				createdAt: true,
 				name: true,

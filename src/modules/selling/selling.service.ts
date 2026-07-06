@@ -205,6 +205,7 @@ export class SellingService {
 					title: BotSellingTitleEnum.new,
 					totalPayment: total,
 					totalPrice: body.totalPrice,
+					totalDiscountPrice: body.totalDiscountPrice ?? body.totalPrice,
 					debt: body.totalPrice.minus(total),
 					products: selling.products.map((p) => ({ ...p, status: BotSellingProductTitleEnum.new })),
 				}

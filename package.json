@@ -95,15 +95,34 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "rootDir": ".",
+    "testMatch": [
+      "<rootDir>/src/**/*.spec.ts",
+      "<rootDir>/test/**/*.spec.ts"
+    ],
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageDirectory": "coverage",
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@common$": "<rootDir>/src/common",
+      "^@common/(.*)$": "<rootDir>/src/common/$1",
+      "^@config$": "<rootDir>/src/configs",
+      "^@config/(.*)$": "<rootDir>/src/configs/$1",
+      "^@module$": "<rootDir>/src/modules",
+      "^@module/(.*)$": "<rootDir>/src/modules/$1",
+      "^@shared$": "<rootDir>/src/modules/shared",
+      "^@shared/(.*)$": "<rootDir>/src/modules/shared/$1"
+    },
+    "globals": {
+      "ts-jest": {
+        "diagnostics": false,
+        "isolatedModules": true
+      }
+    }
   }
 }

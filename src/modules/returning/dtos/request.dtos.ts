@@ -50,7 +50,7 @@ export class ReturningCreateOneRequestDto extends IntersectionType(PickType(Retu
 	products?: ReturningProduct[]
 }
 
-export class ReturningUpdateOneRequestDto extends IntersectionType(PickType(ReturningOptionalDto, ['deletedAt', 'clientId', 'date'])) implements ReturningUpdateOneRequest {
+export class ReturningUpdateOneRequestDto extends IntersectionType(PickType(ReturningOptionalDto, ['deletedAt', 'clientId', 'date', 'discount'])) implements ReturningUpdateOneRequest {
 	@ApiPropertyOptional({ type: ReturningPaymentDto })
 	@IsOptional()
 	@ValidateNested()

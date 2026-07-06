@@ -47,6 +47,7 @@ export class ProductRepository {
 				id: true,
 				cost: true,
 				price: true,
+				wholesalePrice: true,
 				count: true,
 				createdAt: true,
 				name: true,
@@ -71,6 +72,7 @@ export class ProductRepository {
 				id: true,
 				cost: true,
 				price: true,
+				wholesalePrice: true,
 				count: true,
 				createdAt: true,
 				name: true,
@@ -149,6 +151,7 @@ export class ProductRepository {
 				count: body.count,
 				minAmount: body.minAmount,
 				price: body.price,
+				wholesalePrice: body.wholesalePrice ?? 0,
 			},
 		})
 		return product
@@ -163,6 +166,7 @@ export class ProductRepository {
 				count: body.count,
 				minAmount: body.minAmount,
 				price: body.price,
+				wholesalePrice: body.wholesalePrice,
 			},
 		})
 

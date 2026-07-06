@@ -22,6 +22,11 @@ export class ProductRequiredDto extends DefaultRequiredFieldsDto implements Prod
 
 	@ApiProperty({ type: Number })
 	@IsNotEmpty()
+	@IsDecimalIntOrBigInt()
+	wholesalePrice: Decimal
+
+	@ApiProperty({ type: Number })
+	@IsNotEmpty()
 	@IsNumber()
 	count: number
 
@@ -46,6 +51,11 @@ export class ProductOptionalDto extends DefaultOptionalFieldsDto implements Prod
 	@IsOptional()
 	@IsDecimalIntOrBigInt()
 	price?: Decimal
+
+	@ApiPropertyOptional({ type: Number })
+	@IsOptional()
+	@IsDecimalIntOrBigInt()
+	wholesalePrice?: Decimal
 
 	@ApiPropertyOptional({ type: Number })
 	@IsOptional()
