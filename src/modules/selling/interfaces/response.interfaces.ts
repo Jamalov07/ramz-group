@@ -27,6 +27,7 @@ export declare interface SellingFindOneData extends Pick<SellingRequired, 'id' |
 	totalPayment?: Decimal
 	totalPrice?: Decimal
 	totalDiscountPrice?: Decimal
+	discount?: Decimal
 	products?: ProductMVFindOneData[]
 	title?: BotSellingTitleEnum
 	payment?: ClientPaymentFindOneData

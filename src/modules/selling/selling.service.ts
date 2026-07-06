@@ -206,6 +206,7 @@ export class SellingService {
 					totalPayment: total,
 					totalPrice: body.totalPrice,
 					totalDiscountPrice: body.totalDiscountPrice ?? body.totalPrice,
+					discount: selling.discount ?? new Decimal(0),
 					debt: body.totalPrice.minus(total),
 					products: selling.products.map((p) => ({ ...p, status: BotSellingProductTitleEnum.new })),
 				}
@@ -301,6 +302,7 @@ export class SellingService {
 			client: client.data,
 			title: isFirstSend ? BotSellingTitleEnum.new : undefined,
 			totalPayment: total,
+			discount: discount ?? new Decimal(0),
 			totalPrice: updatedSelling.totalPrice,
 			totalDiscountPrice: updatedDiscountPrice,
 			debt: updatedDiscountPrice.minus(total),

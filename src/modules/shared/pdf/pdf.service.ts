@@ -23,8 +23,8 @@ export class PdfService {
 						{
 							width: '*',
 							stack: [
-								{ text: `Клиент: ${selling.client.fullname}`, fontSize: 12, margin: [0, 4, 0, 4] },
-								{ text: `Дата продажа: ${this.formatDate(selling.date)}`, fontSize: 12 },
+								{ text: `Mijoz: ${selling.client.fullname}`, fontSize: 12, margin: [0, 4, 0, 4] },
+								{ text: `Sotuv sanasi: ${this.formatDate(selling.date)}`, fontSize: 12 },
 							],
 							margin: [0, 20, 0, 0], // **shu bilan balandlikni logo darajasiga tushiramiz**
 						},
@@ -42,10 +42,10 @@ export class PdfService {
 						body: [
 							[
 								{ text: '№', bold: true },
-								{ text: 'Товар или услуга', bold: true },
-								{ text: 'Кол-во', bold: true },
-								{ text: 'Цена', bold: true },
-								{ text: 'Сумма', bold: true },
+								{ text: 'Mahsulot yoki xizmat', bold: true },
+								{ text: 'Soni', bold: true },
+								{ text: 'Narxi', bold: true },
+								{ text: 'Jami', bold: true },
 							],
 							...selling.products.map((item, index) => [index + 1, item.product.name, item.count, item.price.toNumber(), item.price.mul(item.count).toNumber()]),
 						],
@@ -80,54 +80,67 @@ export class PdfService {
 					},
 					margin: [0, 10, 0, 10],
 				},
-			{
-				text: `Итого: ${selling.totalPrice?.toNumber() || 0}`,
-				fontSize: 13,
-				bold: true,
-				alignment: 'right',
-				margin: [0, 5, 0, 0],
+				{
+					columns: [
+						{ text: 'Jami:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
+						{ text: `${selling.totalPrice?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', margin: [10, 0, 0, 0] },
+					],
+					margin: [0, 8, 0, 0],
+				},
+				{
+					columns: [
+						{ text: 'Chegirma:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
+						{ text: `${selling.discount?.toNumber() || 0}%`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: '#e67e22', margin: [10, 0, 0, 0] },
+					],
+					margin: [0, 4, 0, 0],
+				},
+				{
+					columns: [
+						{ text: 'Jami chegirmadagi qiymati:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
+						{ text: `${(selling.totalDiscountPrice ?? selling.totalPrice)?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', margin: [10, 0, 0, 0] },
+					],
+					margin: [0, 4, 0, 0],
+				},
+				{
+					columns: [
+						{ text: "To'lov:", bold: true, fontSize: 13, width: '*', alignment: 'right' },
+						{
+							text: `${selling.totalPayment?.toNumber() ?? selling.payment?.total?.toNumber() ?? 0}`,
+							bold: true,
+							fontSize: 13,
+							width: 'auto',
+							alignment: 'right',
+							color: 'green',
+							margin: [10, 0, 0, 0],
+						},
+					],
+					margin: [0, 4, 0, 0],
+				},
+				{
+					columns: [
+						{ text: 'Qarz:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
+						{ text: `${selling.debt?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: 'red', margin: [10, 0, 0, 0] },
+					],
+					margin: [0, 4, 0, 0],
+				},
+			],
+			images: {
+				logo: logoBase64,
 			},
-			{
-				text: `Сумма со скидкой: ${(selling.totalDiscountPrice ?? selling.totalPrice)?.toNumber() || 0}`,
-				fontSize: 13,
-				bold: true,
-				alignment: 'right',
-				margin: [0, 5, 0, 0],
+			defaultStyle: {
+				font: 'Roboto',
 			},
-			{
-				text: `Оплачено: ${selling.totalPayment?.toNumber() ?? selling.payment?.total?.toNumber() ?? 0}`,
-				fontSize: 13,
-				bold: true,
-				color: 'green',
-				alignment: 'right',
-				margin: [0, 5, 0, 0],
-			},
-			{
-				text: `Остаток долга: ${selling.debt?.toNumber() || 0}`,
-				fontSize: 13,
-				bold: true,
-				color: 'red',
-				alignment: 'right',
-				margin: [0, 5, 0, 0],
-			},
-		],
-		images: {
-			logo: logoBase64,
-		},
-		defaultStyle: {
-			font: 'Roboto',
-		},
+		}
+
+		return new Promise((resolve, reject) => {
+			const pdfDocGenerator = pdfMake.createPdf(docDefinition)
+			pdfDocGenerator.getBuffer((buffer) => {
+				resolve(Buffer.from(buffer))
+			})
+		})
 	}
 
-	return new Promise((resolve, reject) => {
-		const pdfDocGenerator = pdfMake.createPdf(docDefinition)
-		pdfDocGenerator.getBuffer((buffer) => {
-			resolve(Buffer.from(buffer))
-		})
-	})
-}
-
-async generateInvoicePdfBuffer2(selling: SellingFindOneData): Promise<Buffer> {
+	async generateInvoicePdfBuffer2(selling: SellingFindOneData): Promise<Buffer> {
 		const docDefinition: TDocumentDefinitions = {
 			content: [
 				{
@@ -135,8 +148,8 @@ async generateInvoicePdfBuffer2(selling: SellingFindOneData): Promise<Buffer> {
 						{
 							width: '*',
 							stack: [
-								{ text: `Клиент: ${selling.client.fullname}`, fontSize: 12, margin: [0, 4, 0, 4] },
-								{ text: `Дата продажа: ${this.formatDate(selling.date)}`, fontSize: 12 },
+								{ text: `Mijoz: ${selling.client.fullname}`, fontSize: 12, margin: [0, 4, 0, 4] },
+								{ text: `Sotuv sanasi: ${this.formatDate(selling.date)}`, fontSize: 12 },
 							],
 							margin: [0, 20, 0, 0],
 						},
@@ -155,10 +168,10 @@ async generateInvoicePdfBuffer2(selling: SellingFindOneData): Promise<Buffer> {
 						body: [
 							[
 								{ text: '№', bold: true, alignment: 'center', fillColor: '#f2f2f2', fontSize: 13 },
-								{ text: 'Товар или услуга', bold: true, alignment: 'center', fillColor: '#f2f2f2', fontSize: 13 },
-								{ text: 'Кол-во', bold: true, alignment: 'center', fillColor: '#f2f2f2', fontSize: 13 },
-								{ text: 'Цена', bold: true, alignment: 'center', fillColor: '#f2f2f2', fontSize: 13 },
-								{ text: 'Сумма', bold: true, alignment: 'center', fillColor: '#f2f2f2', fontSize: 13 },
+								{ text: 'Mahsulot yoki xizmat', bold: true, alignment: 'center', fillColor: '#f2f2f2', fontSize: 13 },
+								{ text: 'Soni', bold: true, alignment: 'center', fillColor: '#f2f2f2', fontSize: 13 },
+								{ text: 'Narxi', bold: true, alignment: 'center', fillColor: '#f2f2f2', fontSize: 13 },
+								{ text: 'Jami', bold: true, alignment: 'center', fillColor: '#f2f2f2', fontSize: 13 },
 							],
 							...selling.products
 								.filter((pro) => pro.status !== BotSellingProductTitleEnum.deleted)
@@ -201,54 +214,67 @@ async generateInvoicePdfBuffer2(selling: SellingFindOneData): Promise<Buffer> {
 					},
 					margin: [0, 10, 0, 10],
 				},
-			{
-				text: `Итого: ${selling.totalPrice?.toNumber() || 0}`,
-				fontSize: 13,
-				bold: true,
-				alignment: 'right',
-				margin: [0, 5, 0, 0],
+				{
+					columns: [
+						{ text: 'Jami:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
+						{ text: `${selling.totalPrice?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', margin: [10, 0, 0, 0] },
+					],
+					margin: [0, 8, 0, 0],
+				},
+				{
+					columns: [
+						{ text: 'Chegirma:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
+						{ text: `${selling.discount?.toNumber() || 0}%`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: '#e67e22', margin: [10, 0, 0, 0] },
+					],
+					margin: [0, 4, 0, 0],
+				},
+				{
+					columns: [
+						{ text: 'Jami chegirmadagi qiymati:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
+						{ text: `${(selling.totalDiscountPrice ?? selling.totalPrice)?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', margin: [10, 0, 0, 0] },
+					],
+					margin: [0, 4, 0, 0],
+				},
+				{
+					columns: [
+						{ text: "To'lov:", bold: true, fontSize: 13, width: '*', alignment: 'right' },
+						{
+							text: `${selling.totalPayment?.toNumber() ?? selling.payment?.total?.toNumber() ?? 0}`,
+							bold: true,
+							fontSize: 13,
+							width: 'auto',
+							alignment: 'right',
+							color: 'green',
+							margin: [10, 0, 0, 0],
+						},
+					],
+					margin: [0, 4, 0, 0],
+				},
+				{
+					columns: [
+						{ text: 'Qarz:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
+						{ text: `${selling.debt?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: 'red', margin: [10, 0, 0, 0] },
+					],
+					margin: [0, 4, 0, 0],
+				},
+			],
+			images: {
+				logo: logoBase64,
 			},
-			{
-				text: `Сумма со скидкой: ${(selling.totalDiscountPrice ?? selling.totalPrice)?.toNumber() || 0}`,
-				fontSize: 13,
-				bold: true,
-				alignment: 'right',
-				margin: [0, 5, 0, 0],
+			defaultStyle: {
+				font: 'Roboto',
 			},
-			{
-				text: `Оплачено: ${selling.totalPayment?.toNumber() ?? selling.payment?.total?.toNumber() ?? 0}`,
-				fontSize: 13,
-				bold: true,
-				color: 'green',
-				alignment: 'right',
-				margin: [0, 5, 0, 0],
-			},
-			{
-				text: `Остаток долга: ${selling.debt?.toNumber() || 0}`,
-				fontSize: 13,
-				bold: true,
-				color: 'red',
-				alignment: 'right',
-				margin: [0, 5, 0, 0],
-			},
-		],
-		images: {
-			logo: logoBase64,
-		},
-		defaultStyle: {
-			font: 'Roboto',
-		},
+		}
+
+		return new Promise((resolve, reject) => {
+			const pdfDocGenerator = pdfMake.createPdf(docDefinition)
+			pdfDocGenerator.getBuffer((buffer) => {
+				resolve(Buffer.from(buffer))
+			})
+		})
 	}
 
-	return new Promise((resolve, reject) => {
-		const pdfDocGenerator = pdfMake.createPdf(docDefinition)
-		pdfDocGenerator.getBuffer((buffer) => {
-			resolve(Buffer.from(buffer))
-		})
-	})
-}
-
-private formatDate(date: Date): string {
+	private formatDate(date: Date): string {
 		const dd = String(date.getDate()).padStart(2, '0')
 		const mm = String(date.getMonth() + 1).padStart(2, '0') // 0-based
 		const yyyy = date.getFullYear()

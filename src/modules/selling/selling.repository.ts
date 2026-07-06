@@ -250,6 +250,7 @@ export class SellingRepository implements OnModuleInit {
 				createdAt: true,
 				deletedAt: true,
 				date: true,
+				discount: true,
 				client: { select: { fullname: true, phone: true, id: true, createdAt: true, telegram: true } },
 				staff: { select: { fullname: true, phone: true, id: true, createdAt: true } },
 				payment: { select: { total: true, id: true, card: true, cash: true, other: true, type: true, transfer: true, description: true, createdAt: true } },
