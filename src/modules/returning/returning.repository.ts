@@ -64,6 +64,8 @@ export class ReturningRepository implements OnModuleInit {
 				createdAt: true,
 				deletedAt: true,
 				date: true,
+				discount: true,
+				totalDiscountPrice: true,
 				client: { select: { fullname: true, phone: true, id: true, createdAt: true } },
 				staff: { select: { fullname: true, phone: true, id: true, createdAt: true } },
 				payment: { select: { total: true, id: true, cash: true, fromBalance: true } },

@@ -118,7 +118,7 @@ export class BotService {
 		const bufferPdf = await this.pdfService.generateInvoicePdfBuffer2(selling)
 
 		let caption = ''
-		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${selling.totalPrice.toNumber()}\n` + `💸 Долг: ${selling.debt.toNumber()}\n`
+		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${selling.totalDiscountPrice.toNumber()}\n` + `💸 Долг: ${selling.debt.toNumber()}\n`
 
 		const clientInfo = `👤 Клиент: ${selling.client.fullname}\n` + `📊 Общий долг: ${selling.client.debt.toNumber()}`
 
@@ -174,7 +174,7 @@ export class BotService {
 		if (!chatInfo) return
 
 		let caption = ''
-		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${selling.totalPrice.toNumber()}\n` + `💸 Долг: ${selling.debt.toNumber()}\n`
+		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${selling.totalDiscountPrice.toNumber()}\n` + `💸 Долг: ${selling.debt.toNumber()}\n`
 
 		const clientInfo = `👤 Клиент: ${selling.client.fullname}\n` + `📊 Общий долг: ${selling.client.debt.toNumber()}`
 
@@ -191,7 +191,7 @@ export class BotService {
 		const bufferPdf = await this.pdfService.generateInvoicePdfBuffer2(selling)
 
 		let caption = ''
-		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${selling.totalPrice.toNumber()}\n` + `💸 Долг: ${selling.debt.toNumber()}\n`
+		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${selling.totalDiscountPrice.toNumber()}\n` + `💸 Долг: ${selling.debt.toNumber()}\n`
 
 		const clientInfo = `👤 Клиент: ${selling.client.fullname}\n` + `📊 Общий долг: ${selling.client.debt.toNumber()}`
 
