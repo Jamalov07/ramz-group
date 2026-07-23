@@ -372,11 +372,37 @@ export class ProductMVRepository {
 		return product
 	}
 
-	async updateSellingTotalPrice(id: string, totalPrice: Decimal) {
-		const selling = await this.prisma.sellingModel.findFirst({ where: { id }, select: { discount: true } })
-		const discount = selling?.discount ?? new Decimal(0)
-		const totalDiscountPrice = totalPrice.mul(new Decimal(100).minus(discount)).div(100)
-		await this.prisma.sellingModel.update({ where: { id: id }, data: { totalPrice: totalPrice, totalDiscountPrice: totalDiscountPrice } })
+	/** Selling totalPrice/totalDiscountPrice ni mahsulotlardan qayta hisoblaydi (increment/race o‘rniga). */
+	async recalculateSellingTotalPrice(sellingId: string): Promise<Decimal> {
+		return this.prisma.$transaction(async (tx) => {
+			// Parallel product add paytida lost-update bo‘lmasligi uchun qatorni qulflash
+			await tx.$queryRawUnsafe(`SELECT id FROM selling WHERE id = $1::uuid FOR UPDATE`, sellingId)
+
+			const selling = await tx.sellingModel.findFirst({
+				where: { id: sellingId },
+				select: {
+					discount: true,
+					products: { select: { price: true, count: true } },
+				},
+			})
+			if (!selling) return new Decimal(0)
+
+			const totalPrice = selling.products.reduce((acc, p) => acc.plus(p.price.mul(p.count)), new Decimal(0))
+			const discount = selling.discount ?? new Decimal(0)
+			const totalDiscountPrice = totalPrice.mul(new Decimal(100).minus(discount)).div(100)
+
+			await tx.sellingModel.update({
+				where: { id: sellingId },
+				data: { totalPrice, totalDiscountPrice },
+			})
+
+			return totalPrice
+		})
+	}
+
+	/** @deprecated use recalculateSellingTotalPrice */
+	async updateSellingTotalPrice(id: string, _totalPrice: Decimal) {
+		return this.recalculateSellingTotalPrice(id)
 	}
 
 	async updateOneArrival(query: ProductMVGetOneRequest, body: ArrivalProductMVUpdateOneRequest) {
@@ -466,10 +492,7 @@ export class ProductMVRepository {
 		})
 
 		if (product.type === ServiceTypeEnum.selling) {
-			const totalPrice = product.selling.totalPrice.minus(product.price.mul(product.count))
-			const sellingDiscount = product.selling.discount ?? new Decimal(0)
-			const totalDiscountPrice = totalPrice.mul(new Decimal(100).minus(sellingDiscount)).div(100)
-			await this.prisma.sellingModel.update({ where: { id: product.selling.id }, data: { totalPrice: totalPrice, totalDiscountPrice: totalDiscountPrice } })
+			await this.recalculateSellingTotalPrice(product.selling.id)
 			if (product.selling && product.selling.status === SellingStatusEnum.accepted) {
 				await this.prisma.productModel.update({ where: { id: product.product.id }, data: { count: { increment: product.count } } })
 			}

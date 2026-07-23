@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { formatMoney } from '@common'
 import { PdfService, PrismaService } from '../shared'
 import { Context, Markup, Telegraf } from 'telegraf'
 import { Message } from 'telegraf/typings/core/types/typegram'
@@ -118,9 +119,9 @@ export class BotService {
 		const bufferPdf = await this.pdfService.generateInvoicePdfBuffer2(selling)
 
 		let caption = ''
-		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${selling.totalDiscountPrice.toNumber()}\n` + `💸 Долг: ${selling.debt.toNumber()}\n`
+		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${formatMoney(selling.totalDiscountPrice)}\n` + `💸 Долг: ${formatMoney(selling.debt)}\n`
 
-		const clientInfo = `👤 Клиент: ${selling.client.fullname}\n` + `📊 Общий долг: ${selling.client.debt.toNumber()}`
+		const clientInfo = `👤 Клиент: ${selling.client.fullname}\n` + `📊 Общий долг: ${formatMoney(selling.client.debt)}`
 
 		let productInfo = ''
 
@@ -134,7 +135,7 @@ export class BotService {
 			case BotSellingTitleEnum.added: {
 				const newProduct = findProductByStatus(BotSellingProductTitleEnum.new)
 				if (newProduct) {
-					productInfo = `\n📦 Товар добавлен\n` + `• Название: ${newProduct.product.name}\n` + `• Цена: ${newProduct.price.toNumber()}\n` + `• Кол-во: ${newProduct.count}`
+					productInfo = `\n📦 Товар добавлен\n` + `• Название: ${newProduct.product.name}\n` + `• Цена: ${formatMoney(newProduct.price)}\n` + `• Кол-во: ${newProduct.count}`
 				}
 				caption = `${baseInfo}${productInfo}\n\n${clientInfo}`
 				break
@@ -144,7 +145,7 @@ export class BotService {
 				const updatedProduct = findProductByStatus(BotSellingProductTitleEnum.updated)
 				if (updatedProduct) {
 					productInfo =
-						`\n♻️ Товар обновлён\n` + `• Название: ${updatedProduct.product.name}\n` + `• Цена: ${updatedProduct.price.toNumber()}\n` + `• Кол-во: ${updatedProduct.count}`
+						`\n♻️ Товар обновлён\n` + `• Название: ${updatedProduct.product.name}\n` + `• Цена: ${formatMoney(updatedProduct.price)}\n` + `• Кол-во: ${updatedProduct.count}`
 				}
 				caption = `${baseInfo}${productInfo}\n\n${clientInfo}`
 				break
@@ -154,7 +155,7 @@ export class BotService {
 				const deletedProduct = findProductByStatus(BotSellingProductTitleEnum.deleted)
 				if (deletedProduct) {
 					productInfo =
-						`\n🗑️ Товар удалён\n` + `• Название: ${deletedProduct.product.name}\n` + `• Цена: ${deletedProduct.price.toNumber()}\n` + `• Кол-во: ${deletedProduct.count}`
+						`\n🗑️ Товар удалён\n` + `• Название: ${deletedProduct.product.name}\n` + `• Цена: ${formatMoney(deletedProduct.price)}\n` + `• Кол-во: ${deletedProduct.count}`
 				}
 				caption = `${baseInfo}${productInfo}\n\n${clientInfo}`
 				break
@@ -174,9 +175,9 @@ export class BotService {
 		if (!chatInfo) return
 
 		let caption = ''
-		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${selling.totalDiscountPrice.toNumber()}\n` + `💸 Долг: ${selling.debt.toNumber()}\n`
+		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${formatMoney(selling.totalDiscountPrice)}\n` + `💸 Долг: ${formatMoney(selling.debt)}\n`
 
-		const clientInfo = `👤 Клиент: ${selling.client.fullname}\n` + `📊 Общий долг: ${selling.client.debt.toNumber()}`
+		const clientInfo = `👤 Клиент: ${selling.client.fullname}\n` + `📊 Общий долг: ${formatMoney(selling.client.debt)}`
 
 		caption = `🗑️ Продажа удалено\n\n${baseInfo}\n\n${clientInfo}`
 
@@ -191,9 +192,9 @@ export class BotService {
 		const bufferPdf = await this.pdfService.generateInvoicePdfBuffer2(selling)
 
 		let caption = ''
-		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${selling.totalDiscountPrice.toNumber()}\n` + `💸 Долг: ${selling.debt.toNumber()}\n`
+		const baseInfo = `🧾 Продажа\n\n` + `🆔 Заказ: ${selling.publicId}\n` + `💰 Сумма: ${formatMoney(selling.totalDiscountPrice)}\n` + `💸 Долг: ${formatMoney(selling.debt)}\n`
 
-		const clientInfo = `👤 Клиент: ${selling.client.fullname}\n` + `📊 Общий долг: ${selling.client.debt.toNumber()}`
+		const clientInfo = `👤 Клиент: ${selling.client.fullname}\n` + `📊 Общий долг: ${formatMoney(selling.client.debt)}`
 
 		let productInfo = ''
 
@@ -207,7 +208,7 @@ export class BotService {
 			case BotSellingTitleEnum.added: {
 				const newProduct = findProductByStatus(BotSellingProductTitleEnum.new)
 				if (newProduct) {
-					productInfo = `\n📦 Товар добавлен\n` + `• Название: ${newProduct.product.name}\n` + `• Цена: ${newProduct.price.toNumber()}\n` + `• Кол-во: ${newProduct.count}`
+					productInfo = `\n📦 Товар добавлен\n` + `• Название: ${newProduct.product.name}\n` + `• Цена: ${formatMoney(newProduct.price)}\n` + `• Кол-во: ${newProduct.count}`
 				}
 				caption = `${baseInfo}${productInfo}\n\n${clientInfo}`
 				break
@@ -217,7 +218,7 @@ export class BotService {
 				const updatedProduct = findProductByStatus(BotSellingProductTitleEnum.updated)
 				if (updatedProduct) {
 					productInfo =
-						`\n♻️ Товар обновлён\n` + `• Название: ${updatedProduct.product.name}\n` + `• Цена: ${updatedProduct.price.toNumber()}\n` + `• Кол-во: ${updatedProduct.count}`
+						`\n♻️ Товар обновлён\n` + `• Название: ${updatedProduct.product.name}\n` + `• Цена: ${formatMoney(updatedProduct.price)}\n` + `• Кол-во: ${updatedProduct.count}`
 				}
 				caption = `${baseInfo}${productInfo}\n\n${clientInfo}`
 				break
@@ -227,7 +228,7 @@ export class BotService {
 				const deletedProduct = findProductByStatus(BotSellingProductTitleEnum.deleted)
 				if (deletedProduct) {
 					productInfo =
-						`\n🗑️ Товар удалён\n` + `• Название: ${deletedProduct.product.name}\n` + `• Цена: ${deletedProduct.price.toNumber()}\n` + `• Кол-во: ${deletedProduct.count}`
+						`\n🗑️ Товар удалён\n` + `• Название: ${deletedProduct.product.name}\n` + `• Цена: ${formatMoney(deletedProduct.price)}\n` + `• Кол-во: ${deletedProduct.count}`
 				}
 				caption = `${baseInfo}${productInfo}\n\n${clientInfo}`
 				break
@@ -259,14 +260,14 @@ export class BotService {
 			`📌 Тип: ${paymentType[payment.type] ?? 'неизвестно'}\n` +
 			`👤 Клиент: ${client.fullname}\n` +
 			`📞 Телефон: ${client.phone}\n` +
-			`💰 Сумма: ${totalPayment.toNumber()}\n\n` +
-			`💵 Наличными: ${payment.cash.toNumber()}\n` +
-			`💳 Картой: ${payment.card.toNumber()}\n` +
-			`🏦 Переводом: ${payment.transfer.toNumber()}\n` +
-			`📦 Другое: ${payment.other.toNumber()}\n` +
+			`💰 Сумма: ${formatMoney(totalPayment)}\n\n` +
+			`💵 Наличными: ${formatMoney(payment.cash)}\n` +
+			`💳 Картой: ${formatMoney(payment.card)}\n` +
+			`🏦 Переводом: ${formatMoney(payment.transfer)}\n` +
+			`📦 Другое: ${formatMoney(payment.other)}\n` +
 			`📅 Дата: ${this.formatDate(payment.createdAt)}\n` +
 			`📝 Описание: ${payment.description ?? '-'}\n` +
-			`📊 Общий долг: ${client.debt.toNumber()}`
+			`📊 Общий долг: ${formatMoney(client.debt)}`
 
 		await this.bot.telegram.sendMessage(channelId, title)
 	}
@@ -289,14 +290,14 @@ export class BotService {
 			`📌 Тип: ${paymentType[payment.type] ?? 'неизвестно'}\n` +
 			`👤 Клиент: ${client.fullname}\n` +
 			`📞 Телефон: ${client.phone}\n` +
-			`💰 Сумма: ${totalPayment.toNumber()}\n\n` +
-			`💵 Наличными: ${payment.cash.toNumber()}\n` +
-			`💳 Картой: ${payment.card.toNumber()}\n` +
-			`🏦 Переводом: ${payment.transfer.toNumber()}\n` +
-			`📦 Другое: ${payment.other.toNumber()}\n` +
+			`💰 Сумма: ${formatMoney(totalPayment)}\n\n` +
+			`💵 Наличными: ${formatMoney(payment.cash)}\n` +
+			`💳 Картой: ${formatMoney(payment.card)}\n` +
+			`🏦 Переводом: ${formatMoney(payment.transfer)}\n` +
+			`📦 Другое: ${formatMoney(payment.other)}\n` +
 			`📅 Дата: ${this.formatDate(payment.createdAt)}\n` +
 			`📝 Описание: ${payment.description ?? '-'}\n` +
-			`📊 Общий долг: ${client.debt.toNumber()}`
+			`📊 Общий долг: ${formatMoney(client.debt)}`
 
 		await this.bot.telegram.sendMessage(channelId, title)
 	}

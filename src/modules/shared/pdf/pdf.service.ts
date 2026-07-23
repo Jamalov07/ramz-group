@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { formatMoney } from '@common'
 import { PrismaService } from '../prisma'
 import { SellingFindOneData } from '../../selling'
 import * as pdfMake from 'pdfmake/build/pdfmake'
@@ -47,7 +48,7 @@ export class PdfService {
 								{ text: 'Narxi', bold: true },
 								{ text: 'Jami', bold: true },
 							],
-							...selling.products.map((item, index) => [index + 1, item.product.name, item.count, item.price.toNumber(), item.price.mul(item.count).toNumber()]),
+							...selling.products.map((item, index) => [index + 1, item.product.name, item.count, formatMoney(item.price), formatMoney(item.price.mul(item.count))]),
 						],
 					},
 					layout: {
@@ -83,21 +84,28 @@ export class PdfService {
 				{
 					columns: [
 						{ text: 'Jami:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
-						{ text: `${selling.totalPrice?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', margin: [10, 0, 0, 0] },
+						{ text: formatMoney(selling.totalPrice), bold: true, fontSize: 13, width: 'auto', alignment: 'right', margin: [10, 0, 0, 0] },
 					],
 					margin: [0, 8, 0, 0],
 				},
 				{
 					columns: [
 						{ text: 'Chegirma:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
-						{ text: `${selling.discount?.toNumber() || 0}%`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: '#e67e22', margin: [10, 0, 0, 0] },
+						{ text: `${formatMoney(selling.discount)}%`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: '#e67e22', margin: [10, 0, 0, 0] },
 					],
 					margin: [0, 4, 0, 0],
 				},
 				{
 					columns: [
 						{ text: 'Jami chegirmadagi qiymati:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
-						{ text: `${(selling.totalDiscountPrice ?? selling.totalPrice)?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', margin: [10, 0, 0, 0] },
+						{
+							text: formatMoney(selling.totalDiscountPrice ?? selling.totalPrice),
+							bold: true,
+							fontSize: 13,
+							width: 'auto',
+							alignment: 'right',
+							margin: [10, 0, 0, 0],
+						},
 					],
 					margin: [0, 4, 0, 0],
 				},
@@ -105,7 +113,7 @@ export class PdfService {
 					columns: [
 						{ text: "To'lov:", bold: true, fontSize: 13, width: '*', alignment: 'right' },
 						{
-							text: `${selling.totalPayment?.toNumber() ?? selling.payment?.total?.toNumber() ?? 0}`,
+							text: formatMoney(selling.totalPayment ?? selling.payment?.total),
 							bold: true,
 							fontSize: 13,
 							width: 'auto',
@@ -119,7 +127,7 @@ export class PdfService {
 				{
 					columns: [
 						{ text: 'Qarz:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
-						{ text: `${selling.debt?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: 'red', margin: [10, 0, 0, 0] },
+						{ text: formatMoney(selling.debt), bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: 'red', margin: [10, 0, 0, 0] },
 					],
 					margin: [0, 4, 0, 0],
 				},
@@ -180,8 +188,8 @@ export class PdfService {
 										{ text: index + 1, fontSize: 12, alignment: 'center' },
 										{ text: item.product.name, fontSize: 12, alignment: 'left' },
 										{ text: item.count.toString(), fontSize: 12, alignment: 'center' },
-										{ text: item.price.toNumber().toString(), fontSize: 12, alignment: 'right' },
-										{ text: item.price.mul(item.count).toNumber().toString(), fontSize: 12, alignment: 'right' },
+										{ text: formatMoney(item.price), fontSize: 12, alignment: 'right' },
+										{ text: formatMoney(item.price.mul(item.count)), fontSize: 12, alignment: 'right' },
 									]
 								}),
 						],
@@ -217,21 +225,28 @@ export class PdfService {
 				{
 					columns: [
 						{ text: 'Jami:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
-						{ text: `${selling.totalPrice?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', margin: [10, 0, 0, 0] },
+						{ text: formatMoney(selling.totalPrice), bold: true, fontSize: 13, width: 'auto', alignment: 'right', margin: [10, 0, 0, 0] },
 					],
 					margin: [0, 8, 0, 0],
 				},
 				{
 					columns: [
 						{ text: 'Chegirma:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
-						{ text: `${selling.discount?.toNumber() || 0}%`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: '#e67e22', margin: [10, 0, 0, 0] },
+						{ text: `${formatMoney(selling.discount)}%`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: '#e67e22', margin: [10, 0, 0, 0] },
 					],
 					margin: [0, 4, 0, 0],
 				},
 				{
 					columns: [
 						{ text: 'Jami chegirmadagi qiymati:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
-						{ text: `${(selling.totalDiscountPrice ?? selling.totalPrice)?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', margin: [10, 0, 0, 0] },
+						{
+							text: formatMoney(selling.totalDiscountPrice ?? selling.totalPrice),
+							bold: true,
+							fontSize: 13,
+							width: 'auto',
+							alignment: 'right',
+							margin: [10, 0, 0, 0],
+						},
 					],
 					margin: [0, 4, 0, 0],
 				},
@@ -239,7 +254,7 @@ export class PdfService {
 					columns: [
 						{ text: "To'lov:", bold: true, fontSize: 13, width: '*', alignment: 'right' },
 						{
-							text: `${selling.totalPayment?.toNumber() ?? selling.payment?.total?.toNumber() ?? 0}`,
+							text: formatMoney(selling.totalPayment ?? selling.payment?.total),
 							bold: true,
 							fontSize: 13,
 							width: 'auto',
@@ -253,7 +268,7 @@ export class PdfService {
 				{
 					columns: [
 						{ text: 'Qarz:', bold: true, fontSize: 13, width: '*', alignment: 'right' },
-						{ text: `${selling.debt?.toNumber() || 0}`, bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: 'red', margin: [10, 0, 0, 0] },
+						{ text: formatMoney(selling.debt), bold: true, fontSize: 13, width: 'auto', alignment: 'right', color: 'red', margin: [10, 0, 0, 0] },
 					],
 					margin: [0, 4, 0, 0],
 				},

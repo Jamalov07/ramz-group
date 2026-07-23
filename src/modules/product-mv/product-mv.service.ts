@@ -125,7 +125,8 @@ export class ProductMVService {
 			totalPrice: new Decimal(body.price ?? 0).mul(body.count),
 		})
 
-		await this.sellingService.updateOne(request, { id: productmv.selling.id }, { totalPrice: productmv.selling.totalPrice.plus(productmv.totalPrice) })
+		// eski total + yangi (race) o‘rniga — barcha mahsulotlardan qayta hisoblash
+		await this.productMVRepository.recalculateSellingTotalPrice(productmv.selling.id)
 
 		if (productmv.selling.status === SellingStatusEnum.accepted) {
 			// await this.sendSellingNotifications(productmv, false)
@@ -178,13 +179,7 @@ export class ProductMVService {
 			totalPrice: new Decimal(body.price ?? productmv.data.price).mul(body.count ?? productmv.data.count),
 		})
 
-		const newSellingTotalPrice = productmv.data.selling.totalPrice.minus(productmv.data.totalPrice).plus(sellingProduct.totalPrice)
-		console.log(body.price, productmv.data.price, body.count, productmv.data.count)
-		console.log(productmv.data.selling.totalPrice, productmv.data.totalPrice, sellingProduct.totalPrice)
-		console.log(newSellingTotalPrice)
-
-		// await this.sellingService.updateOne({ id: sellingProduct.selling.id }, { totalPrice: newSellingTotalPrice })
-		await this.productMVRepository.updateSellingTotalPrice(sellingProduct.selling.id, newSellingTotalPrice)
+		await this.productMVRepository.recalculateSellingTotalPrice(sellingProduct.selling.id)
 
 		// if (sellingProduct.selling.status === SellingStatusEnum.accepted) {
 		// const client = await this.clientService.findOne({ id: sellingProduct.selling.client.id })

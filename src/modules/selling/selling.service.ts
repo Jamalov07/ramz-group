@@ -52,22 +52,27 @@ export class SellingService {
 		}
 
 		const mappedSellings = sellings.map((selling) => {
-			const discountPrice = selling.totalDiscountPrice ?? selling.totalPrice
-			calc.totalPrice = calc.totalPrice.plus(selling.totalPrice)
+			// DB dagi totalPrice race/stale bo‘lishi mumkin — mahsulotlardan hisoblaymiz
+			const totalPrice = this.sumProductsTotal(selling.products)
+			const discount = new Decimal(selling.discount ?? 0)
+			const discountPrice = totalPrice.mul(new Decimal(100).minus(discount)).div(100)
+			const paymentTotal = selling.payment?.total ?? new Decimal(0)
+
+			calc.totalPrice = calc.totalPrice.plus(totalPrice)
 			calc.totalDiscountPrice = calc.totalDiscountPrice.plus(discountPrice)
-			calc.totalPayment = calc.totalPayment.plus(selling.payment.total)
-			calc.totalDebt = calc.totalDebt.plus(discountPrice.minus(selling.payment.total))
-			calc.totalCardPayment = calc.totalCardPayment.plus(selling.payment.card)
-			calc.totalCashPayment = calc.totalCashPayment.plus(selling.payment.cash)
-			calc.totalOtherPayment = calc.totalOtherPayment.plus(selling.payment.other)
-			calc.totalTransferPayment = calc.totalTransferPayment.plus(selling.payment.transfer)
+			calc.totalPayment = calc.totalPayment.plus(paymentTotal)
+			calc.totalDebt = calc.totalDebt.plus(discountPrice.minus(paymentTotal))
+			calc.totalCardPayment = calc.totalCardPayment.plus(selling.payment?.card ?? 0)
+			calc.totalCashPayment = calc.totalCashPayment.plus(selling.payment?.cash ?? 0)
+			calc.totalOtherPayment = calc.totalOtherPayment.plus(selling.payment?.other ?? 0)
+			calc.totalTransferPayment = calc.totalTransferPayment.plus(selling.payment?.transfer ?? 0)
 
 			return {
 				...selling,
-				payment: selling.payment.total.toNumber() ? selling.payment : null,
-				debt: discountPrice.minus(selling.payment.total),
-				totalPayment: selling.payment.total,
-				totalPrice: selling.totalPrice,
+				payment: paymentTotal.toNumber() ? selling.payment : null,
+				debt: discountPrice.minus(paymentTotal),
+				totalPayment: paymentTotal,
+				totalPrice,
 				totalDiscountPrice: discountPrice,
 			}
 		})
@@ -96,12 +101,19 @@ export class SellingService {
 			throw new BadRequestException(ERROR_MSG.SELLING.NOT_FOUND.UZ)
 		}
 
-		const totalPrice = selling.products.reduce((acc, product) => {
-			return acc.plus(new Decimal(product.count).mul(product.price))
-		}, new Decimal(0))
+		const totalPrice = this.sumProductsTotal(selling.products)
+		const discount = new Decimal(selling.discount ?? 0)
+		const totalDiscountPrice = totalPrice.mul(new Decimal(100).minus(discount)).div(100)
+		const paymentTotal = selling.payment?.total ?? new Decimal(0)
 
 		return createResponse({
-			data: { ...selling, debt: totalPrice.minus(selling.payment.total), totalPayment: selling.payment.total, totalPrice: totalPrice },
+			data: {
+				...selling,
+				debt: totalDiscountPrice.minus(paymentTotal),
+				totalPayment: paymentTotal,
+				totalPrice,
+				totalDiscountPrice,
+			},
 			success: { messages: ['find one success'] },
 		})
 	}
@@ -282,10 +294,10 @@ export class SellingService {
 				: selling.data.payment, // agar payment yo‘q bo‘lsa, eskisini saqlaymiz
 		}
 
-		// Discount va totalDiscountPrice hisoblash
+		// Discount va totalPrice — client totalPrice ishonchsiz (stale/race); mahsulotlardan hisoblanadi
 		const existingDiscount = new Decimal(selling.data.discount ?? 0)
 		const discount = body.discount !== undefined ? new Decimal(body.discount) : existingDiscount
-		const totalPrice = body.totalPrice !== undefined ? new Decimal(body.totalPrice) : new Decimal(selling.data.totalPrice ?? 0)
+		const totalPrice = this.sumProductsTotal(selling.data.products)
 		const totalDiscountPrice = totalPrice.mul(new Decimal(100).minus(discount)).div(100)
 		body.totalPrice = totalPrice
 		body.discount = discount
@@ -505,5 +517,10 @@ export class SellingService {
 		const result = await this.sellingRepository.getPeriodStats(query)
 
 		return createResponse({ data: result, success: { messages: ['get period stats success'] } })
+	}
+
+	/** Mahsulotlar yig‘indisi: sum(price × count) — DB totalPrice o‘rniga ishonchli manba */
+	private sumProductsTotal(products: { price: Decimal; count: number }[] | undefined | null): Decimal {
+		return (products ?? []).reduce((acc, product) => acc.plus(new Decimal(product.count).mul(product.price)), new Decimal(0))
 	}
 }
