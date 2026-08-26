@@ -11,6 +11,7 @@ import {
 	SellingFindOneRequest,
 	SellingDeleteOneRequest,
 	SellingGetTotalStatsRequest,
+	SellingGetProfitStatsRequest,
 	SellingGetPeriodStatsRequest,
 } from './interfaces'
 import { Decimal } from '@prisma/client/runtime/library'
@@ -517,6 +518,45 @@ export class SellingService {
 		const result = await this.sellingRepository.getPeriodStats(query)
 
 		return createResponse({ data: result, success: { messages: ['get period stats success'] } })
+	}
+
+	async getProfitStats(query: SellingGetProfitStatsRequest) {
+		const now = new Date()
+
+		const getDateRange = (type: 'daily' | 'weekly' | 'monthly' | 'yearly') => {
+			const start = new Date(now)
+			const end = new Date(now)
+
+			if (type === 'weekly') {
+				start.setDate(now.getDate() - now.getDay())
+				end.setDate(start.getDate() + 6)
+			} else if (type === 'monthly') {
+				start.setDate(1)
+				end.setMonth(start.getMonth() + 1, 0)
+			} else if (type === 'yearly') {
+				start.setMonth(0, 1)
+				end.setMonth(11, 31)
+			}
+
+			return { startDate: start, endDate: end }
+		}
+
+		const statTypes = ['daily', 'weekly', 'monthly', 'yearly'] as const
+
+		const statsPromises = statTypes.map((type) => {
+			const { startDate, endDate } = getDateRange(type)
+			return this.sellingRepository.sumProfitByDateRange({
+				startDate: new Date(new Date(startDate).setHours(0, 0, 0, 0)),
+				endDate: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
+			})
+		})
+
+		const [daily, weekly, monthly, yearly] = await Promise.all(statsPromises)
+
+		return createResponse({
+			data: { daily, weekly, monthly, yearly },
+			success: { messages: ['get profit stats success'] },
+		})
 	}
 
 	/** Mahsulotlar yig‘indisi: sum(price × count) — DB totalPrice o‘rniga ishonchli manba */

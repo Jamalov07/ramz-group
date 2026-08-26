@@ -66,6 +66,17 @@ export declare interface SellingGetTotalStatsResponse extends GlobalResponse {
 	data: SellingGetTotalStatsData
 }
 
+export declare interface SellingGetProfitStatsData {
+	daily: Decimal
+	weekly: Decimal
+	monthly: Decimal
+	yearly: Decimal
+}
+
+export declare interface SellingGetProfitStatsResponse extends GlobalResponse {
+	data: SellingGetProfitStatsData
+}
+
 export declare interface SellingGetPeriodStatsData {
 	date: string
 	sum: Decimal

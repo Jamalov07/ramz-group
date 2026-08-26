@@ -9,6 +9,8 @@ import {
 	SellingFindOneResponse,
 	SellingGetPeriodStatsData,
 	SellingGetPeriodStatsResponse,
+	SellingGetProfitStatsData,
+	SellingGetProfitStatsResponse,
 	SellingGetTotalStatsData,
 	SellingGetTotalStatsResponse,
 	SellingModifyResponse,
@@ -104,6 +106,25 @@ export class SellingGetTotalStatsDataDto implements SellingGetTotalStatsData {
 export class SellingGetTotalStatsResponseDto extends GlobalResponseDto implements SellingGetTotalStatsResponse {
 	@ApiProperty({ type: SellingGetTotalStatsDataDto })
 	data: SellingGetTotalStatsData
+}
+
+export class SellingGetProfitStatsDataDto implements SellingGetProfitStatsData {
+	@ApiProperty({ type: Number })
+	daily: Decimal
+
+	@ApiProperty({ type: Number })
+	weekly: Decimal
+
+	@ApiProperty({ type: Number })
+	monthly: Decimal
+
+	@ApiProperty({ type: Number })
+	yearly: Decimal
+}
+
+export class SellingGetProfitStatsResponseDto extends GlobalResponseDto implements SellingGetProfitStatsResponse {
+	@ApiProperty({ type: SellingGetProfitStatsDataDto })
+	data: SellingGetProfitStatsData
 }
 
 export class SellingGetPeriodStatsDataDto implements SellingGetPeriodStatsData {

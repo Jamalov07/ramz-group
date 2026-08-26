@@ -19,13 +19,16 @@ export declare interface SellingPayment extends Pick<ClientPaymentRequired, 'car
 
 export declare interface SellingProduct extends Pick<ProductMVRequired, 'price' | 'count' | 'productId'>, Pick<ProductMVOptional, 'totalPrice'> {}
 
-export declare interface SellingCreateOneRequest extends Pick<SellingRequired, 'clientId' | 'date'>, Pick<SellingOptional, 'staffId' | 'status' | 'totalPrice' | 'totalDiscountPrice'> {
+export declare interface SellingCreateOneRequest
+	extends Pick<SellingRequired, 'clientId' | 'date'>,
+		Pick<SellingOptional, 'staffId' | 'status' | 'totalPrice' | 'totalDiscountPrice'> {
 	payment?: SellingPayment
 	products?: SellingProduct[]
 	send?: boolean
 }
 
-export declare interface SellingUpdateOneRequest extends Pick<SellingOptional, 'deletedAt' | 'clientId' | 'date' | 'status' | 'staffId' | 'totalPrice' | 'discount' | 'totalDiscountPrice'> {
+export declare interface SellingUpdateOneRequest
+	extends Pick<SellingOptional, 'deletedAt' | 'clientId' | 'date' | 'status' | 'staffId' | 'totalPrice' | 'discount' | 'totalDiscountPrice'> {
 	payment?: SellingPayment
 	send?: boolean
 }
@@ -33,6 +36,8 @@ export declare interface SellingUpdateOneRequest extends Pick<SellingOptional, '
 export declare interface SellingDeleteOneRequest extends Pick<SellingOptional, 'id'>, Pick<RequestOtherFields, 'method'> {}
 
 export declare interface SellingGetTotalStatsRequest {}
+
+export declare interface SellingGetProfitStatsRequest {}
 
 export declare interface SellingGetPeriodStatsRequest {
 	type?: StatsTypeEnum

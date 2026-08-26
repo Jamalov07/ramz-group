@@ -370,6 +370,30 @@ export class SellingRepository implements OnModuleInit {
 		await this.prisma.createActionMethods(SellingController)
 	}
 
+	async sumProfitByDateRange(query: { startDate: Date; endDate: Date }): Promise<Decimal> {
+		const products = await this.prisma.productMVModel.findMany({
+			where: {
+				type: ServiceTypeEnum.selling,
+				selling: {
+					date: {
+						gte: query.startDate,
+						lte: query.endDate,
+					},
+					client: { deletedAt: null },
+					status: SellingStatusEnum.accepted,
+				},
+			},
+			select: {
+				price: true,
+				cost: true,
+				count: true,
+				product: { select: { cost: true } },
+			},
+		})
+
+		return sumSoldProductsProfit(products)
+	}
+
 	async getPeriodStats(query: SellingGetPeriodStatsRequest) {
 		if (query.type === StatsTypeEnum.day) {
 			return this.getDayStats()
@@ -496,4 +520,13 @@ export class SellingRepository implements OnModuleInit {
 		}
 		return salesByMonth
 	}
+}
+
+/** Sotuv foydasi: (sotish narxi - tannarx) × soni. ProductMV.cost 0 bo‘lsa Product.cost olinadi. */
+export function sumSoldProductsProfit(products: Array<{ price: Decimal; cost: Decimal; count: number; product?: { cost: Decimal } | null }>): Decimal {
+	return products.reduce((acc, p) => {
+		const mvCost = new Decimal(p.cost ?? 0)
+		const unitCost = mvCost.isZero() ? new Decimal(p.product?.cost ?? 0) : mvCost
+		return acc.plus(new Decimal(p.price).minus(unitCost).mul(p.count))
+	}, new Decimal(0))
 }

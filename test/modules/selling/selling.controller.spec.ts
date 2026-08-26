@@ -8,6 +8,7 @@ const mockSellingService = {
 	excelDownloadMany: jest.fn(),
 	getTotalStats: jest.fn(),
 	getPeriodStats: jest.fn(),
+	getProfitStats: jest.fn(),
 	findOne: jest.fn(),
 	excelDownloadOne: jest.fn(),
 	createOne: jest.fn(),
@@ -35,7 +36,7 @@ describe('SellingController', () => {
 	})
 
 	describe('findMany (GET /selling/many)', () => {
-		it("barcha sotuvlarni qaytarishi kerak", async () => {
+		it('barcha sotuvlarni qaytarishi kerak', async () => {
 			const query = { page: 1, pageSize: 10 } as any
 			const mockResult = { data: { sellings: [], total: 0 } }
 			mockSellingService.findMany.mockResolvedValue(mockResult)
@@ -59,7 +60,7 @@ describe('SellingController', () => {
 	})
 
 	describe('getTotalStats (GET /selling/total-stats)', () => {
-		it("umumiy statistikani qaytarishi kerak", async () => {
+		it('umumiy statistikani qaytarishi kerak', async () => {
 			const query = { startDate: '2024-01-01', endDate: '2024-12-31' } as any
 			const mockResult = { data: { totalAmount: 5000000, totalCount: 100 } }
 			mockSellingService.getTotalStats.mockResolvedValue(mockResult)
@@ -71,8 +72,28 @@ describe('SellingController', () => {
 		})
 	})
 
+	describe('getProfitStats (GET /selling/profit-stats)', () => {
+		it('kunlik, haftalik, oylik va yillik foydani qaytarishi kerak', async () => {
+			const query = {} as any
+			const mockResult = {
+				data: {
+					daily: 100000,
+					weekly: 500000,
+					monthly: 2000000,
+					yearly: 15000000,
+				},
+			}
+			mockSellingService.getProfitStats.mockResolvedValue(mockResult)
+
+			const result = await controller.getProfitStats(query)
+
+			expect(mockSellingService.getProfitStats).toHaveBeenCalledWith(query)
+			expect(result).toEqual(mockResult)
+		})
+	})
+
 	describe('getPeriodStats (GET /selling/period-stats)', () => {
-		it("davr statistikasini qaytarishi kerak", async () => {
+		it('davr statistikasini qaytarishi kerak', async () => {
 			const query = { period: 'monthly' } as any
 			const mockResult = { data: { stats: [] } }
 			mockSellingService.getPeriodStats.mockResolvedValue(mockResult)
@@ -85,7 +106,7 @@ describe('SellingController', () => {
 	})
 
 	describe('findOne (GET /selling/one)', () => {
-		it("bitta sotuvni qaytarishi kerak", async () => {
+		it('bitta sotuvni qaytarishi kerak', async () => {
 			const query = { id: 'selling-id-1' } as any
 			const mockResult = { data: { id: 'selling-id-1' } }
 			mockSellingService.findOne.mockResolvedValue(mockResult)
@@ -98,7 +119,7 @@ describe('SellingController', () => {
 	})
 
 	describe('excelDownloadOne (GET /selling/excel-download/one)', () => {
-		it("bitta sotuv excel faylini yuklab olishi kerak", async () => {
+		it('bitta sotuv excel faylini yuklab olishi kerak', async () => {
 			const query = { id: 'selling-id-1' } as any
 			mockSellingService.excelDownloadOne.mockResolvedValue(undefined)
 
@@ -109,7 +130,7 @@ describe('SellingController', () => {
 	})
 
 	describe('createOne (POST /selling/one)', () => {
-		it("yangi sotuv yaratishi kerak", async () => {
+		it('yangi sotuv yaratishi kerak', async () => {
 			const body = { clientId: 'client-id-1', products: [], totalAmount: 150000 } as any
 			const mockResult = { data: { id: 'selling-id-1' } }
 			mockSellingService.createOne.mockResolvedValue(mockResult)
@@ -122,7 +143,7 @@ describe('SellingController', () => {
 	})
 
 	describe('updateOne (PATCH /selling/one)', () => {
-		it("sotuvni yangilashi kerak", async () => {
+		it('sotuvni yangilashi kerak', async () => {
 			const query = { id: 'selling-id-1' } as any
 			const body = { description: 'updated note' } as any
 			const mockResult = { data: { id: 'selling-id-1' } }

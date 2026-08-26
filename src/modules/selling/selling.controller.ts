@@ -12,6 +12,8 @@ import {
 	SellingCreateOneResponseDto,
 	SellingGetTotalStatsResponseDto,
 	SellingGetTotalStatsRequestDto,
+	SellingGetProfitStatsResponseDto,
+	SellingGetProfitStatsRequestDto,
 	SellingGetPeriodStatsResponseDto,
 	SellingGetPeriodStatsRequestDto,
 } from './dtos'
@@ -44,6 +46,14 @@ export class SellingController {
 	@AuthOptions(false, false)
 	async getTotalStats(@Query() query: SellingGetTotalStatsRequestDto): Promise<SellingGetTotalStatsResponseDto> {
 		return this.sellingService.getTotalStats(query)
+	}
+
+	@Get('profit-stats')
+	@ApiOkResponse({ type: SellingGetProfitStatsResponseDto })
+	@ApiOperation({ summary: 'get profit stats' })
+	@AuthOptions(false, false)
+	async getProfitStats(@Query() query: SellingGetProfitStatsRequestDto): Promise<SellingGetProfitStatsResponseDto> {
+		return await this.sellingService.getProfitStats(query)
 	}
 
 	@Get('period-stats')

@@ -5,6 +5,7 @@ import {
 	SellingFindManyRequest,
 	SellingFindOneRequest,
 	SellingGetPeriodStatsRequest,
+	SellingGetProfitStatsRequest,
 	SellingGetTotalStatsRequest,
 	SellingPayment,
 	SellingProduct,
@@ -69,6 +70,8 @@ export class SellingDeleteOneRequestDto
 	implements SellingDeleteOneRequest {}
 
 export class SellingGetTotalStatsRequestDto implements SellingGetTotalStatsRequest {}
+
+export class SellingGetProfitStatsRequestDto implements SellingGetProfitStatsRequest {}
 
 export class SellingGetPeriodStatsRequestDto implements SellingGetPeriodStatsRequest {
 	@ApiPropertyOptional({ enum: StatsTypeEnum })
